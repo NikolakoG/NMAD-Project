@@ -1,6 +1,6 @@
-# FollowUp Project
+# NMAD-Project
 
-Desktop application for tracking entries with expiration notifications via email.
+NMAD Project (Never Miss A Thing) is a computer app that helps you keep track of your deadlines.
 
 ## Features
 
