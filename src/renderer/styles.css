@@ -220,16 +220,27 @@ body {
   font-weight: 500;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  font-family: inherit;
+}
+
+.form-group input {
   min-height: 36.5px;
 }
 
-.form-group input:focus {
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #3498db;
 }
@@ -552,12 +563,19 @@ body {
   text-align: right;
 }
 
-.detail-field input {
+.detail-field input,
+.detail-field textarea {
   width: 55%;
   padding: 6px 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  font-family: inherit;
+}
+
+.detail-field textarea {
+  resize: vertical;
+  min-height: 60px;
 }
 
 .edit-section-btn {
@@ -604,6 +622,7 @@ body {
 .form-section:last-child {
   border-bottom: none;
   margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .form-section h4 {

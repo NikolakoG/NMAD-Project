@@ -17,7 +17,8 @@ function EntryModal({ entry, onSave, onClose }) {
     ergo: '',
     psycho: '',
     mp: '',
-    eid: ''
+    eid: '',
+    comments: ''
   });
 
   useEffect(() => {
@@ -38,7 +39,8 @@ function EntryModal({ entry, onSave, onClose }) {
         ergo: entry.ergo || '',
         psycho: entry.psycho || '',
         mp: entry.mp || '',
-        eid: entry.eid || ''
+        eid: entry.eid || '',
+        comments: entry.comments || ''
       });
     } else {
       setFormData({
@@ -57,7 +59,8 @@ function EntryModal({ entry, onSave, onClose }) {
         ergo: '',
         psycho: '',
         mp: '',
-        eid: ''
+        eid: '',
+        comments: ''
       });
     }
   }, [entry]);
@@ -116,9 +119,12 @@ function EntryModal({ entry, onSave, onClose }) {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h3>{entry ? 'Επεξεργασία Εγγραφής' : 'Προσθήκη Νέας Εγγραφής'}</h3>
+        <div className="modal-header">
+          <h3>{entry ? 'Επεξεργασία Εγγραφής' : 'Προσθήκη Νέας Εγγραφής'}</h3>
+        </div>
         
         <form onSubmit={handleSubmit}>
+          <div className="modal-body">
           <div className="form-columns">
             <div className="form-column">
               <div className="form-section">
@@ -333,6 +339,19 @@ function EntryModal({ entry, onSave, onClose }) {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="comments">Σχόλια:</label>
+            <textarea
+              id="comments"
+              name="comments"
+              value={formData.comments}
+              onChange={handleInputChange}
+              placeholder="Εισάγετε σχόλια (προαιρετικό)"
+              rows="3"
+            />
+          </div>
           </div>
 
           <div className="modal-actions">

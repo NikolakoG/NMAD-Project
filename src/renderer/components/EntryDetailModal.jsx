@@ -49,6 +49,11 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
           eid: entry.eid || ''
         });
         break;
+      case 'comments':
+        setEditData({
+          comments: entry.comments || ''
+        });
+        break;
     }
   };
 
@@ -119,13 +124,23 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
             <div key={field.key} className="detail-field">
               <label>{field.label}:</label>
               {isEditing ? (
-                <input
-                  type={field.type || 'text'}
-                  name={field.key}
-                  value={editData[field.key] || ''}
-                  onChange={handleInputChange}
-                  placeholder={field.placeholder}
-                />
+                field.type === 'textarea' ? (
+                  <textarea
+                    name={field.key}
+                    value={editData[field.key] || ''}
+                    onChange={handleInputChange}
+                    placeholder={field.placeholder}
+                    rows="3"
+                  />
+                ) : (
+                  <input
+                    type={field.type || 'text'}
+                    name={field.key}
+                    value={editData[field.key] || ''}
+                    onChange={handleInputChange}
+                    placeholder={field.placeholder}
+                  />
+                )
               ) : (
                 <span>{field.formatter ? field.formatter(entry[field.key]) : (entry[field.key] || '-')}</span>
               )}
@@ -318,6 +333,19 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
               </div>
             </div>
           </div>
+
+          {renderEditableSection(
+            'Σχόλια',
+            [
+              { 
+                key: 'comments', 
+                label: 'Σχόλια', 
+                placeholder: 'Εισάγετε σχόλια',
+                type: 'textarea'
+              }
+            ],
+            'comments'
+          )}
         </div>
 
         <div className="modal-actions">
