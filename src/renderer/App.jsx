@@ -18,7 +18,6 @@ function App() {
   const [showAlertConfirm, setShowAlertConfirm] = useState(false);
   const [pendingAlertEntries, setPendingAlertEntries] = useState([]);
   const [emailTracking, setEmailTracking] = useState(null);
-  const [showEmailSendingModal, setShowEmailSendingModal] = useState(false);
 
   useEffect(() => {
     loadEntries();
@@ -28,8 +27,6 @@ function App() {
     // Listen for IPC messages from main process
     ipcRenderer.on('show-catchup-alert', handleCatchupAlert);
     ipcRenderer.on('automatic-email-results', handleAutomaticEmailResults);
-    ipcRenderer.on('show-email-sending-modal', handleShowEmailSendingModal);
-    ipcRenderer.on('hide-email-sending-modal', handleHideEmailSendingModal);
     
     // Test IPC listener
     console.log('Frontend: IPC listeners registered');
@@ -38,8 +35,6 @@ function App() {
     return () => {
       ipcRenderer.removeListener('show-catchup-alert', handleCatchupAlert);
       ipcRenderer.removeListener('automatic-email-results', handleAutomaticEmailResults);
-      ipcRenderer.removeListener('show-email-sending-modal', handleShowEmailSendingModal);
-      ipcRenderer.removeListener('hide-email-sending-modal', handleHideEmailSendingModal);
     };
   }, []);
 
@@ -88,13 +83,6 @@ function App() {
     loadEmailTracking();
   };
 
-  const handleShowEmailSendingModal = () => {
-    setShowEmailSendingModal(true);
-  };
-
-  const handleHideEmailSendingModal = () => {
-    setShowEmailSendingModal(false);
-  };
 
   const saveEntries = async (newEntries) => {
     try {
@@ -337,19 +325,6 @@ function App() {
         </div>
       )}
 
-      {showEmailSendingModal && (
-        <div className="modal-overlay">
-          <div className="modal email-sending-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="email-sending-content">
-              <div className="loader-container">
-                <div className="loader"></div>
-              </div>
-              <h3>Γίνεται αποστολή αυτοματοποιημένων emails...</h3>
-              <p>Παρακαλώ περιμένετε...</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

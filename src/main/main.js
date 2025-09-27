@@ -194,10 +194,6 @@ async function sendDailyExpirationEmails(isCatchUp = false) {
   try {
     console.log(`🔍 sendDailyExpirationEmails called - isCatchUp: ${isCatchUp}`);
 
-    // Show the email sending modal
-    if (mainWindow && mainWindow.webContents) {
-      mainWindow.webContents.send('show-email-sending-modal');
-    }
 
     const entries = await loadEntries();
     console.log(`📊 Loaded ${entries.length} total entries`);
@@ -270,11 +266,6 @@ async function sendDailyExpirationEmails(isCatchUp = false) {
 
   } catch (error) {
     console.error('Σφάλμα κατά την αποστολή καθημερινών emails:', error);
-  } finally {
-    // Hide the email sending modal
-    if (mainWindow && mainWindow.webContents) {
-      mainWindow.webContents.send('hide-email-sending-modal');
-    }
   }
 }
 
