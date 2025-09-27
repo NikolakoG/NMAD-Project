@@ -129,18 +129,6 @@ function EmailConfig({ config, onSave, onClose }) {
           </div>
         </div>
       )}
-      
-      {!config && !isEditing && (
-        <div>
-          <p>Οι ειδοποιήσεις email δεν είναι ρυθμισμένες. Ρυθμίστε τις για να λαμβάνετε ειδοποιήσεις λήξης.</p>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setIsEditing(true)}
-          >
-            Ρύθμιση Email
-          </button>
-        </div>
-      )}
     </div>
   );
 }
