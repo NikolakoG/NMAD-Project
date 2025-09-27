@@ -10,6 +10,7 @@ function EmailConfig({ config, onSave, onClose }) {
     notifyEmail: ''
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (config) {
@@ -19,9 +20,24 @@ function EmailConfig({ config, onSave, onClose }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Remove spaces from password field while typing
+    const cleanedValue = name === 'password' ? value.replace(/\s/g, '') : value;
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: cleanedValue
+    }));
+  };
+
+  const handlePasswordPaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text');
+    const cleanedText = pastedText.replace(/\s/g, ''); // Remove all spaces
+    
+    setFormData(prev => ({
+      ...prev,
+      password: cleanedText
     }));
   };
 
@@ -93,15 +109,25 @@ function EmailConfig({ config, onSave, onClose }) {
 
           <div className="form-group">
             <label htmlFor="password">Κωδικός Εφαρμογής Gmail:</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Your app-specific password"
-              required
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                onPaste={handlePasswordPaste}
+                placeholder="Your app-specific password"
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
           </div>
 
           <div className="form-group">
