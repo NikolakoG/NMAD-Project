@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import formatName from '../../utils/formatName.mjs';
 
 function EntryTable({ entries, onEdit, onDelete, onView }) {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+  
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -48,8 +50,8 @@ function EntryTable({ entries, onEdit, onDelete, onView }) {
       
       switch (sortConfig.key) {
         case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+          aValue = formatName(a).toLowerCase();
+          bValue = formatName(b).toLowerCase();
           break;
         case 'startingDate':
           aValue = new Date(a.startingDate);
@@ -129,7 +131,7 @@ function EntryTable({ entries, onEdit, onDelete, onView }) {
                   onClick={() => onView(entry)}
                   title="Κάντε κλικ για περισσότερες πληροφορίες"
                 >
-                  {entry.name}
+                  {formatName(entry)}
                 </span>
               </td>
               <td>{formatDate(entry.startingDate)}</td>

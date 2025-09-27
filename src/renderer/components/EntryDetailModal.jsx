@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import formatName from '../../utils/formatName.mjs';
 
 function EntryDetailModal({ entry, onClose, onEdit }) {
   const [editingSection, setEditingSection] = useState(null);
@@ -141,7 +142,7 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
     <div className="modal-overlay">
       <div className="modal detail-modal">
         <div className="modal-header">
-          <h3>Λεπτομέρειες Εγγραφής - {entry.name}</h3>
+          <h3>Λεπτομέρειες Εγγραφής - {formatName(entry)}</h3>
           <button className="close-button" onClick={onClose}>
             ✕
           </button>

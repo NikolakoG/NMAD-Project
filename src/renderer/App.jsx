@@ -3,6 +3,7 @@ import EntryTable from './components/EntryTable';
 import EntryModal from './components/EntryModal';
 import EntryDetailModal from './components/EntryDetailModal';
 import EmailConfig from './components/EmailConfig';
+import formatName from '../utils/formatName.mjs';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -125,17 +126,23 @@ function App() {
   };
 
   const handleSaveEntry = (entryData) => {
+    // Add the formatted name for backward compatibility and display
+    const entryWithName = {
+      ...entryData,
+      name: formatName(entryData)
+    };
+    
     let newEntries;
     
     if (editingEntry) {
       // Edit existing entry
       newEntries = entries.map(entry =>
-        entry.id === editingEntry.id ? { ...entryData, id: editingEntry.id } : entry
+        entry.id === editingEntry.id ? { ...entryWithName, id: editingEntry.id } : entry
       );
     } else {
       // Add new entry
       const newEntry = {
-        ...entryData,
+        ...entryWithName,
         id: Date.now().toString()
       };
       newEntries = [...entries, newEntry];

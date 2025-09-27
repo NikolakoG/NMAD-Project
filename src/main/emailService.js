@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const formatName = require('../utils/formatName');
 
 async function sendEmailNotification(emailConfig, entry, daysUntilExpiry) {
   try {
@@ -13,10 +14,10 @@ async function sendEmailNotification(emailConfig, entry, daysUntilExpiry) {
     const mailOptions = {
       from: emailConfig.user,
       to: emailConfig.notifyEmail,
-      subject: `Γνωμάτευση πρόκειται να λήξει: ${entry.name}`,
+      subject: `Γνωμάτευση πρόκειται να λήξει: ${formatName(entry)}`,
       html: `
         <h3>Γνωμάτευση πρόκειται να λήξει</h3>
-        <p><strong>Ονοματεπώνυμο:</strong> ${entry.name}</p>
+        <p><strong>Ονοματεπώνυμο:</strong> ${formatName(entry)}</p>
         <p><strong>Ημερομηνία Έναρξης:</strong> ${new Date(entry.startingDate).toLocaleDateString()}</p>
         <p><strong>Ημερομηνία Λήξης:</strong> ${new Date(entry.endingDate).toLocaleDateString()}</p>
         <p><strong>Ημέρες μέχρι τη λήξη:</strong> ${daysUntilExpiry}</p>
@@ -26,7 +27,7 @@ async function sendEmailNotification(emailConfig, entry, daysUntilExpiry) {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Στάλθηκε ειδοποίηση email για τη γνωμάτευση: ${entry.name}`);
+    console.log(`Στάλθηκε ειδοποίηση email για τη γνωμάτευση: ${formatName(entry)}`);
     return { success: true };
   } catch (error) {
     console.error('Σφάλμα κατά την αποστολή ειδοποίησης email:', error);
@@ -60,7 +61,7 @@ async function sendAlertEmail(emailConfig, entries) {
       
       entriesList += `
         <tr>
-          <td style="padding: 8px; border: 1px solid #ddd;">${entry.name}</td>
+          <td style="padding: 8px; border: 1px solid #ddd;">${formatName(entry)}</td>
           <td style="padding: 8px; border: 1px solid #ddd;">${new Date(entry.startingDate).toLocaleDateString()}</td>
           <td style="padding: 8px; border: 1px solid #ddd;">${new Date(entry.endingDate).toLocaleDateString()}</td>
           <td style="padding: 8px; border: 1px solid #ddd;">${statusText}</td>

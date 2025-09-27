@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, MenuItem } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 const { sendEmailNotification, sendAlertEmail } = require('./emailService');
+const formatName = require('../utils/formatName');
 
 let mainWindow;
 let dataFilePath;
@@ -29,6 +30,38 @@ const createWindow = () => {
     console.log('Loading HTML from:', htmlPath);
     mainWindow.loadFile(htmlPath);
   }
+
+  // Enable context menu (right-click menu)
+  mainWindow.webContents.on('context-menu', (event, params) => {
+    const menu = new Menu();
+    
+    // Add cut, copy, paste options for editable fields
+    if (params.isEditable) {
+      menu.append(new MenuItem({
+        label: 'Αποκοπή',
+        role: 'cut'
+      }));
+      menu.append(new MenuItem({
+        label: 'Αντιγραφή',
+        role: 'copy'
+      }));
+      menu.append(new MenuItem({
+        label: 'Επικόλληση',
+        role: 'paste'
+      }));
+    } else if (params.selectionText) {
+      // Add copy option for selected text
+      menu.append(new MenuItem({
+        label: 'Αντιγραφή',
+        role: 'copy'
+      }));
+    }
+
+    // Show the context menu if it has items
+    if (menu.items.length > 0) {
+      menu.popup({ window: mainWindow });
+    }
+  });
 };
 
 app.whenReady().then(() => {
@@ -218,7 +251,7 @@ async function sendDailyExpirationEmails(isCatchUp = false) {
     const expiringEntries = entries.filter(entry => {
       const endDate = new Date(entry.endingDate);
       const daysUntilExpiry = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
-      console.log(`  - ${entry.name}: expires ${endDate.toLocaleDateString()} (${daysUntilExpiry} days)`);
+      console.log(`  - ${formatName(entry)}: expires ${endDate.toLocaleDateString()} (${daysUntilExpiry} days)`);
       return endDate <= tenDaysFromNow; // This includes expired entries (endDate < today) and expiring entries
     });
     
@@ -237,7 +270,7 @@ async function sendDailyExpirationEmails(isCatchUp = false) {
           successCount++;
         } else {
           failedCount++;
-          console.error(`Αποτυχία αποστολής email για γνωμάτευση: ${entry.name} - ${result.error}`);
+          console.error(`Αποτυχία αποστολής email για γνωμάτευση: ${formatName(entry)} - ${result.error}`);
         }
         
         // Small delay between emails to avoid rate limiting

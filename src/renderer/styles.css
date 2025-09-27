@@ -226,6 +226,7 @@ body {
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  min-height: 36.5px;
 }
 
 .form-group input:focus {
@@ -679,14 +680,37 @@ body {
   border-color: #3498db;
 }
 
+/* Name fields styling - larger and left-aligned */
+.small-fields-row .small-field input[name="firstName"],
+.small-fields-row .small-field input[name="lastName"] {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 16px;
+  min-height: 36.5px;
+}
+
+.small-fields-row .small-field label[for="firstName"],
+.small-fields-row .small-field label[for="lastName"] {
+  text-align: left; 
+  font-size: 16px;
+}
+
 /* Sum display styling */
 .sum-display {
   text-align: center;
   margin: 12px 0;
   padding: 8px;
   background-color: #f8f9fa;
+}
+
+/* Specific styling for sum display in form */
+.form-column .sum-display {
+  margin-top: 39px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 4px;
+  text-align: center
 }
 
 .sum-display span {

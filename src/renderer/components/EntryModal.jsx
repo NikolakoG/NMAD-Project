@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 function EntryModal({ entry, onSave, onClose }) {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     startingDate: '',
     endingDate: '',
     childAmka: '',
@@ -22,7 +23,8 @@ function EntryModal({ entry, onSave, onClose }) {
   useEffect(() => {
     if (entry) {
       setFormData({
-        name: entry.name || '',
+        firstName: entry.firstName || '',
+        lastName: entry.lastName || '',
         startingDate: entry.startingDate || '',
         endingDate: entry.endingDate || '',
         childAmka: entry.childAmka || '',
@@ -40,7 +42,8 @@ function EntryModal({ entry, onSave, onClose }) {
       });
     } else {
       setFormData({
-        name: '',
+        firstName: '',
+        lastName: '',
         startingDate: '',
         endingDate: '',
         childAmka: '',
@@ -82,8 +85,8 @@ function EntryModal({ entry, onSave, onClose }) {
     e.preventDefault();
     
     // Validation
-    if (!formData.name.trim()) {
-      alert('Παρακαλώ εισάγετε ένα όνομα');
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      alert('Παρακαλώ εισάγετε όνομα και επώνυμο');
       return;
     }
 
@@ -122,16 +125,32 @@ function EntryModal({ entry, onSave, onClose }) {
                 <h4>Πληροφορίες Μαθητή</h4>
 
                 <div className="form-group">
-                  <label htmlFor="name">Ονοματεπώνυμο: *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Εισάγετε ονοματεπώνυμο εγγραφής"
-                    required
-                  />
+                  <div className="small-fields-row">
+                    <div className="small-field">
+                      <label htmlFor="firstName">Όνομα: *</label>
+                      <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        placeholder="Εισάγετε όνομα"
+                        required
+                      />
+                    </div>
+                    <div className="small-field">
+                      <label htmlFor="lastName">Επώνυμο: *</label>
+                      <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        placeholder="Εισάγετε επώνυμο"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="form-group">
