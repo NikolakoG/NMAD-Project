@@ -65,7 +65,7 @@ function App() {
     }
   };
 
-  const handleCatchupAlert = (daysMissed) => {
+  const handleCatchupAlert = (event, daysMissed) => {
     alert(`Το σύστημα εντόπισε ότι δεν στάλθηκαν αυτόματα emails για ${daysMissed} ημέρες. Θα σταλούν τώρα αυτόματα emails για όλες τις γνωματεύσεις που λήγουν σε 10 ημέρες.`);
   };
 

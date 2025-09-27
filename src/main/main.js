@@ -38,8 +38,10 @@ app.whenReady().then(() => {
   
   createWindow();
   
-  // Initialize email scheduling system
-  initializeEmailScheduler();
+  // Initialize email scheduling system after a delay to ensure renderer is ready
+  setTimeout(() => {
+    initializeEmailScheduler();
+  }, 2000);
   
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
