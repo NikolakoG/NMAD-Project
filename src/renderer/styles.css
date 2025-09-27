@@ -587,7 +587,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin-bottom: 20px;
 }
 
 .form-column {
@@ -613,6 +612,16 @@ body {
   font-weight: 600;
   padding-bottom: 8px;
   border-bottom: 2px solid #3498db;
+}
+
+/* Modal subsection titles without border/padding */
+.detail-modal .detail-section .section-header h4 {
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: none;
 }
 
 .form-subsection {

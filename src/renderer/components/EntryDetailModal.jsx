@@ -148,153 +148,172 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
         </div>
 
         <div className="modal-body">
-          {renderEditableSection(
-            'Στοιχεία ΑΜΚΑ',
-            [
-              { key: 'childAmka', label: 'ΑΜΚΑ παιδιού', placeholder: 'Εισάγετε ΑΜΚΑ παιδιού' },
-              { key: 'parentAmka', label: 'ΑΜΚΑ Γονέα', placeholder: 'Εισάγετε ΑΜΚΑ γονέα' }
-            ],
-            'amka'
-          )}
+          <div className="form-columns">
+            <div className="form-column">
+              <div className="form-section">
+                <h4>Πληροφορίες Μαθητή</h4>
+                
+                {renderEditableSection(
+                  'Στοιχεία Επικοινωνίας',
+                  [
+                    { key: 'phone', label: 'Τηλέφωνο', placeholder: 'Εισάγετε αριθμό τηλεφώνου' }
+                  ],
+                  'contact'
+                )}
 
-          {renderEditableSection(
-            'Στοιχεία Επικοινωνίας',
-            [
-              { key: 'phone', label: 'Τηλέφωνο', placeholder: 'Εισάγετε αριθμό τηλεφώνου' }
-            ],
-            'contact'
-          )}
+                {renderEditableSection(
+                  'Στοιχεία ΑΜΚΑ',
+                  [
+                    { key: 'childAmka', label: 'ΑΜΚΑ Μαθητή', placeholder: 'Εισάγετε ΑΜΚΑ Μαθητή' },
+                    { key: 'parentAmka', label: 'ΑΜΚΑ Γονέα', placeholder: 'Εισάγετε ΑΜΚΑ γονέα' }
+                  ],
+                  'amka'
+                )}
 
-          {renderEditableSection(
-            'Στοιχεία Γνωμάτευσης',
-            [
-              { key: 'opinionCode', label: 'Κωδικός Γνωμάτευσης', placeholder: 'Εισάγετε κωδικό γνωμάτευσης' },
-              { key: 'opinionValue', label: 'Αξία Γνωμάτευσης', placeholder: 'Εισάγετε αξία γνωμάτευσης' }
-            ],
-            'opinion'
-          )}
-
-          {renderEditableSection(
-            'Στοιχεία Taxis net',
-            [
-              { key: 'taxisUsername', label: 'Username', placeholder: 'Εισάγετε username' },
-              { key: 'taxisPassword', label: 'Password', type: 'password', placeholder: 'Εισάγετε password' }
-            ],
-            'taxis'
-          )}
-
-          <div className="detail-section">
-            <div className="section-header">
-              <h4>Συνεδριάσεις</h4>
-              {editingSection !== 'sessions' ? (
-                <button
-                  className="btn btn-secondary btn-sm edit-section-btn"
-                  onClick={() => handleEditSection('sessions')}
-                >
-                  ✎
-                </button>
-              ) : (
-                <div className="edit-actions">
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={handleSaveEdit}
-                  >
-                    ✓
-                  </button>
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    onClick={handleCancelEdit}
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="section-content">
-              <div className="sessions-sum">
-                <span>Άθροισμα συνεδριάσεων: {calculateSum()}</span>
+                {renderEditableSection(
+                  'Στοιχεία Taxis net',
+                  [
+                    { key: 'taxisUsername', label: 'Username', placeholder: 'Εισάγετε username' },
+                    { key: 'taxisPassword', label: 'Password', type: 'password', placeholder: 'Εισάγετε password' }
+                  ],
+                  'taxis'
+                )}
               </div>
-              <div className="sessions-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ΛΟΓΟ</th>
-                      <th>ΕΡΓΟ</th>
-                      <th>ΨΥΧΟ</th>
-                      <th>ΜΠ</th>
-                      <th>ΕΙΔ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        {editingSection === 'sessions' ? (
-                          <input
-                            type="number"
-                            name="logo"
-                            value={editData.logo || ''}
-                            onChange={handleInputChange}
-                            placeholder="0"
-                          />
-                        ) : (
-                          entry.logo || '-'
-                        )}
-                      </td>
-                      <td>
-                        {editingSection === 'sessions' ? (
-                          <input
-                            type="number"
-                            name="ergo"
-                            value={editData.ergo || ''}
-                            onChange={handleInputChange}
-                            placeholder="0"
-                          />
-                        ) : (
-                          entry.ergo || '-'
-                        )}
-                      </td>
-                      <td>
-                        {editingSection === 'sessions' ? (
-                          <input
-                            type="number"
-                            name="psycho"
-                            value={editData.psycho || ''}
-                            onChange={handleInputChange}
-                            placeholder="0"
-                          />
-                        ) : (
-                          entry.psycho || '-'
-                        )}
-                      </td>
-                      <td>
-                        {editingSection === 'sessions' ? (
-                          <input
-                            type="number"
-                            name="mp"
-                            value={editData.mp || ''}
-                            onChange={handleInputChange}
-                            placeholder="0"
-                          />
-                        ) : (
-                          entry.mp || '-'
-                        )}
-                      </td>
-                      <td>
-                        {editingSection === 'sessions' ? (
-                          <input
-                            type="number"
-                            name="eid"
-                            value={editData.eid || ''}
-                            onChange={handleInputChange}
-                            placeholder="0"
-                          />
-                        ) : (
-                          entry.eid || '-'
-                        )}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            </div>
+
+            <div className="form-column">
+              <div className="form-section">
+                <h4>Πληροφορίες Γνωμάτευσης</h4>
+                
+                {renderEditableSection(
+                  'Στοιχεία Γνωμάτευσης',
+                  [
+                    { key: 'opinionCode', label: 'Κωδικός Γνωμάτευσης', placeholder: 'Εισάγετε κωδικό γνωμάτευσης' },
+                    { 
+                      key: 'opinionValue', 
+                      label: 'Αξία Γνωμάτευσης', 
+                      placeholder: 'Εισάγετε αξία γνωμάτευσης',
+                      formatter: (value) => value ? `${value} €` : '- €'
+                    }
+                  ],
+                  'opinion'
+                )}
+
+                <div className="detail-section">
+                  <div className="section-header">
+                    <h4>Συνεδριάσεις</h4>
+                    {editingSection !== 'sessions' ? (
+                      <button
+                        className="btn btn-secondary btn-sm edit-section-btn"
+                        onClick={() => handleEditSection('sessions')}
+                      >
+                        ✎
+                      </button>
+                    ) : (
+                      <div className="edit-actions">
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={handleSaveEdit}
+                        >
+                          ✓
+                        </button>
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={handleCancelEdit}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="section-content">
+                    <div className="sessions-sum">
+                      <span>Άθροισμα συνεδριάσεων: {calculateSum()}</span>
+                    </div>
+                    <div className="sessions-table">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>ΛΟΓΟ</th>
+                            <th>ΕΡΓΟ</th>
+                            <th>ΨΥΧΟ</th>
+                            <th>ΜΠ</th>
+                            <th>ΕΙΔ</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>
+                              {editingSection === 'sessions' ? (
+                                <input
+                                  type="number"
+                                  name="logo"
+                                  value={editData.logo || ''}
+                                  onChange={handleInputChange}
+                                  placeholder="0"
+                                />
+                              ) : (
+                                entry.logo || '-'
+                              )}
+                            </td>
+                            <td>
+                              {editingSection === 'sessions' ? (
+                                <input
+                                  type="number"
+                                  name="ergo"
+                                  value={editData.ergo || ''}
+                                  onChange={handleInputChange}
+                                  placeholder="0"
+                                />
+                              ) : (
+                                entry.ergo || '-'
+                              )}
+                            </td>
+                            <td>
+                              {editingSection === 'sessions' ? (
+                                <input
+                                  type="number"
+                                  name="psycho"
+                                  value={editData.psycho || ''}
+                                  onChange={handleInputChange}
+                                  placeholder="0"
+                                />
+                              ) : (
+                                entry.psycho || '-'
+                              )}
+                            </td>
+                            <td>
+                              {editingSection === 'sessions' ? (
+                                <input
+                                  type="number"
+                                  name="mp"
+                                  value={editData.mp || ''}
+                                  onChange={handleInputChange}
+                                  placeholder="0"
+                                />
+                              ) : (
+                                entry.mp || '-'
+                              )}
+                            </td>
+                            <td>
+                              {editingSection === 'sessions' ? (
+                                <input
+                                  type="number"
+                                  name="eid"
+                                  value={editData.eid || ''}
+                                  onChange={handleInputChange}
+                                  placeholder="0"
+                                />
+                              ) : (
+                                entry.eid || '-'
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
