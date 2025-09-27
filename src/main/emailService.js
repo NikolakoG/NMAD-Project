@@ -16,7 +16,7 @@ async function sendEmailNotification(emailConfig, entry, daysUntilExpiry) {
       subject: `Γνωμάτευση πρόκειται να λήξει: ${entry.name}`,
       html: `
         <h3>Γνωμάτευση πρόκειται να λήξει</h3>
-        <p><strong>Όνομα:</strong> ${entry.name}</p>
+        <p><strong>Ονοματεπώνυμο:</strong> ${entry.name}</p>
         <p><strong>Ημερομηνία Έναρξης:</strong> ${new Date(entry.startingDate).toLocaleDateString()}</p>
         <p><strong>Ημερομηνία Λήξης:</strong> ${new Date(entry.endingDate).toLocaleDateString()}</p>
         <p><strong>Ημέρες μέχρι τη λήξη:</strong> ${daysUntilExpiry}</p>
@@ -79,7 +79,7 @@ async function sendAlertEmail(emailConfig, entries) {
         <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
           <thead>
             <tr style="background-color: #f8f9fa;">
-              <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Όνομα</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ονοματεπώνυμο</th>
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ημερομηνία Έναρξης</th>
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ημερομηνία Λήξης</th>
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Κατάσταση</th>

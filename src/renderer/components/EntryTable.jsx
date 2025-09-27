@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
-function EntryTable({ entries, onEdit, onDelete }) {
+function EntryTable({ entries, onEdit, onDelete, onView }) {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
@@ -99,7 +99,7 @@ function EntryTable({ entries, onEdit, onDelete }) {
       <thead>
         <tr>
           <th className="sortable" onClick={() => handleSort('name')}>
-            Όνομα{getSortChevron('name')}
+            Ονοματεπώνυμο{getSortChevron('name')}
           </th>
           <th className="sortable" onClick={() => handleSort('startingDate')}>
             Ημερομηνία Έναρξης{getSortChevron('startingDate')}
@@ -123,7 +123,15 @@ function EntryTable({ entries, onEdit, onDelete }) {
         ) : (
           sortedEntries.map(entry => (
             <tr key={entry.id} className={getRowClass(entry.endingDate)}>
-              <td>{entry.name}</td>
+              <td>
+                <span
+                  className="clickable-name"
+                  onClick={() => onView(entry)}
+                  title="Κάντε κλικ για περισσότερες πληροφορίες"
+                >
+                  {entry.name}
+                </span>
+              </td>
               <td>{formatDate(entry.startingDate)}</td>
               <td>{formatDate(entry.endingDate)}</td>
               <td>{getDaysUntilExpiry(entry.endingDate)}</td>

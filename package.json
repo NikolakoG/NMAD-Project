@@ -1,5 +1,5 @@
 {
-  "name": "followupproject",
+  "name": "nmad",
   "version": "1.0.0",
   "description": "Desktop application for tracking entries with expiration notifications",
   "main": "src/main/main.js",

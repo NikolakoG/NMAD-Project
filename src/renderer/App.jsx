@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EntryTable from './components/EntryTable';
 import EntryModal from './components/EntryModal';
+import EntryDetailModal from './components/EntryDetailModal';
 import EmailConfig from './components/EmailConfig';
 
 const { ipcRenderer } = window.require('electron');
@@ -9,12 +10,15 @@ function App() {
   const [entries, setEntries] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [viewingEntry, setViewingEntry] = useState(null);
   const [emailConfig, setEmailConfig] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [sendingAlert, setSendingAlert] = useState(false);
   const [showAlertConfirm, setShowAlertConfirm] = useState(false);
   const [pendingAlertEntries, setPendingAlertEntries] = useState([]);
   const [emailTracking, setEmailTracking] = useState(null);
+  const [showEmailSendingModal, setShowEmailSendingModal] = useState(false);
 
   useEffect(() => {
     loadEntries();
@@ -24,6 +28,8 @@ function App() {
     // Listen for IPC messages from main process
     ipcRenderer.on('show-catchup-alert', handleCatchupAlert);
     ipcRenderer.on('automatic-email-results', handleAutomaticEmailResults);
+    ipcRenderer.on('show-email-sending-modal', handleShowEmailSendingModal);
+    ipcRenderer.on('hide-email-sending-modal', handleHideEmailSendingModal);
     
     // Test IPC listener
     console.log('Frontend: IPC listeners registered');
@@ -32,6 +38,8 @@ function App() {
     return () => {
       ipcRenderer.removeListener('show-catchup-alert', handleCatchupAlert);
       ipcRenderer.removeListener('automatic-email-results', handleAutomaticEmailResults);
+      ipcRenderer.removeListener('show-email-sending-modal', handleShowEmailSendingModal);
+      ipcRenderer.removeListener('hide-email-sending-modal', handleHideEmailSendingModal);
     };
   }, []);
 
@@ -69,15 +77,23 @@ function App() {
   const handleAutomaticEmailResults = (event, results) => {
     const { mode, successCount, failedCount, totalCount, isCatchUp } = results;
     const modeText = isCatchUp ? 'αναπλήρωσης' : 'κανονικά';
-    
+
     if (failedCount > 0) {
       alert(`Αυτόματα emails ${modeText}: Επιτυχής αποστολή ${successCount} από ${totalCount} emails. ${failedCount} αποτυχίες.`);
     } else {
       alert(`Αυτόματα emails ${modeText}: Επιτυχής αποστολή όλων των ${successCount} emails!`);
     }
-    
+
     // Reload email tracking to update the display
     loadEmailTracking();
+  };
+
+  const handleShowEmailSendingModal = () => {
+    setShowEmailSendingModal(true);
+  };
+
+  const handleHideEmailSendingModal = () => {
+    setShowEmailSendingModal(false);
   };
 
   const saveEntries = async (newEntries) => {
@@ -108,6 +124,11 @@ function App() {
   const handleEditEntry = (entry) => {
     setEditingEntry(entry);
     setShowModal(true);
+  };
+
+  const handleViewEntry = (entry) => {
+    setViewingEntry(entry);
+    setShowDetailModal(true);
   };
 
   const handleDeleteEntry = (entryId) => {
@@ -141,6 +162,19 @@ function App() {
     setEditingEntry(null);
   };
 
+  const handleCloseDetailModal = () => {
+    setShowDetailModal(false);
+    setViewingEntry(null);
+  };
+
+  const handleUpdateFromDetailModal = (updatedEntry) => {
+    const newEntries = entries.map(entry =>
+      entry.id === updatedEntry.id ? updatedEntry : entry
+    );
+    saveEntries(newEntries);
+    setViewingEntry(updatedEntry);
+  };
+
   const handleSettings = () => {
     setShowSettings(true);
   };
@@ -156,7 +190,7 @@ function App() {
 
   const handleSendAlert = () => {
     if (!emailConfig) {
-      alert('Παρακαλώ ρυθμίστε πρώτα τις ρυθμίσεις email');
+      alert('Παρακαλώ ρυθμίστε πρώτα τις ρυθμίσεις email.');
       return;
     }
 
@@ -247,6 +281,7 @@ function App() {
             entries={entries}
             onEdit={handleEditEntry}
             onDelete={handleDeleteEntry}
+            onView={handleViewEntry}
           />
         </div>
       </div>
@@ -256,6 +291,14 @@ function App() {
           entry={editingEntry}
           onSave={handleSaveEntry}
           onClose={handleCloseModal}
+        />
+      )}
+
+      {showDetailModal && (
+        <EntryDetailModal
+          entry={viewingEntry}
+          onClose={handleCloseDetailModal}
+          onEdit={handleUpdateFromDetailModal}
         />
       )}
 
@@ -289,6 +332,20 @@ function App() {
               <button className="btn btn-secondary" onClick={handleCancelSendAlert}>
                 Όχι, Ακύρωση
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEmailSendingModal && (
+        <div className="modal-overlay">
+          <div className="modal email-sending-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="email-sending-content">
+              <div className="loader-container">
+                <div className="loader"></div>
+              </div>
+              <h3>Γίνεται αποστολή αυτοματοποιημένων emails...</h3>
+              <p>Παρακαλώ περιμένετε...</p>
             </div>
           </div>
         </div>
