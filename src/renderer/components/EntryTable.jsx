@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import formatName from '../../utils/formatName.mjs';
 
-function EntryTable({ entries, onEdit, onDelete, onView }) {
+function EntryTable({ entries, searchTerm, onEdit, onDelete, onView }) {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   
   const formatDate = (dateString) => {
@@ -41,10 +41,21 @@ function EntryTable({ entries, onEdit, onDelete, onView }) {
     }
   };
 
-  const sortedEntries = useMemo(() => {
+  const filteredAndSortedEntries = useMemo(() => {
     if (!entries || entries.length === 0) return entries;
     
-    const sortableEntries = [...entries];
+    // First filter by search term
+    let filteredEntries = entries;
+    if (searchTerm && searchTerm.trim() !== '') {
+      const searchLower = searchTerm.toLowerCase().trim();
+      filteredEntries = entries.filter(entry => {
+        const name = formatName(entry).toLowerCase();
+        return name.includes(searchLower);
+      });
+    }
+    
+    // Then sort the filtered entries
+    const sortableEntries = [...filteredEntries];
     sortableEntries.sort((a, b) => {
       let aValue, bValue;
       
@@ -81,7 +92,7 @@ function EntryTable({ entries, onEdit, onDelete, onView }) {
     });
     
     return sortableEntries;
-  }, [entries, sortConfig]);
+  }, [entries, searchTerm, sortConfig]);
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -116,14 +127,17 @@ function EntryTable({ entries, onEdit, onDelete, onView }) {
         </tr>
       </thead>
       <tbody>
-        {sortedEntries.length === 0 ? (
+        {filteredAndSortedEntries.length === 0 ? (
           <tr>
             <td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
-              Δεν βρέθηκαν καταχωρήσεις. Κάντε κλικ στο "+" για να ξεκινήσετε.
+              {searchTerm && searchTerm.trim() !== '' ? 
+                'Δεν βρέθηκαν καταχωρήσεις που να ταιριάζουν με την αναζήτηση.' : 
+                'Δεν βρέθηκαν καταχωρήσεις. Κάντε κλικ στο "+" για να ξεκινήσετε.'
+              }
             </td>
           </tr>
         ) : (
-          sortedEntries.map(entry => (
+          filteredAndSortedEntries.map(entry => (
             <tr key={entry.id} className={getRowClass(entry.endingDate)}>
               <td>
                 <span

@@ -19,6 +19,7 @@ function App() {
   const [showAlertConfirm, setShowAlertConfirm] = useState(false);
   const [pendingAlertEntries, setPendingAlertEntries] = useState([]);
   const [emailTracking, setEmailTracking] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadEntries();
@@ -263,6 +264,9 @@ function App() {
             <button className="btn btn-primary add-button" onClick={handleAddEntry}>
               ✕
             </button>
+            <span className="entries-count">
+              Σύνολο: {entries.length} καταχωρήσεις
+            </span>
           </div>
           <button className="btn btn-secondary summary-email-button" onClick={handleSendAlert} disabled={sendingAlert}>
             {sendingAlert ? 'Αποστολή...' : 'Αποστολή περιληπτικού email'}
@@ -271,9 +275,21 @@ function App() {
             ⚙
           </button>
         </div>
+        
+        <div className="search-section">
+          <input
+            type="text"
+            placeholder="Αναζήτηση καταχωρήσεων..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
         <div className="table-container">
           <EntryTable
             entries={entries}
+            searchTerm={searchTerm}
             onEdit={handleEditEntry}
             onDelete={handleDeleteEntry}
             onView={handleViewEntry}
