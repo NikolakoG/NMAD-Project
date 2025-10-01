@@ -2,7 +2,10 @@ const { app, BrowserWindow, ipcMain, Menu, MenuItem } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 const { sendEmailNotification, sendAlertEmail } = require('./emailService');
-const formatName = require('../utils/formatName');
+
+function formatName(entry) {
+  return `${entry.lastName} ${entry.firstName}`;
+}
 
 let mainWindow;
 let dataFilePath;

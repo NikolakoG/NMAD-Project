@@ -1,5 +1,8 @@
 const nodemailer = require('nodemailer');
-const formatName = require('../utils/formatName');
+
+function formatName(entry) {
+  return `${entry.lastName} ${entry.firstName}`;
+}
 
 async function sendEmailNotification(emailConfig, entry, daysUntilExpiry) {
   try {
