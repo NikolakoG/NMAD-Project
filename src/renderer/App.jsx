@@ -4,7 +4,7 @@ import EntryModal from './components/EntryModal';
 import EntryDetailModal from './components/EntryDetailModal';
 import EmailConfig from './components/EmailConfig';
 
-const { ipcRenderer } = window.electron;
+const { ipcRenderer } = window.require('electron');
 
 function formatName(entry) {
   return `${entry.lastName} ${entry.firstName}`;
@@ -70,11 +70,11 @@ function App() {
     }
   };
 
-  const handleCatchupAlert = (daysMissed) => {
+  const handleCatchupAlert = (event, daysMissed) => {
     alert(`Το σύστημα εντόπισε ότι δεν στάλθηκαν αυτόματα emails για ${daysMissed} ημέρες. Θα σταλούν τώρα αυτόματα emails για όλες τις γνωματεύσεις που λήγουν σε 10 ημέρες.`);
   };
 
-  const handleAutomaticEmailResults = (results) => {
+  const handleAutomaticEmailResults = (event, results) => {
     const { mode, successCount, failedCount, totalCount, isCatchUp } = results;
     const modeText = isCatchUp ? 'αναπλήρωσης' : 'κανονικά';
 
