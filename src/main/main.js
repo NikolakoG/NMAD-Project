@@ -24,7 +24,7 @@ const createWindow = () => {
   });
 
   const isDev = process.env.NODE_ENV === 'development';
-  
+
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools();
@@ -33,6 +33,15 @@ const createWindow = () => {
     console.log('Loading HTML from:', htmlPath);
     mainWindow.loadFile(htmlPath);
   }
+
+  // Clean up when window is closed
+  mainWindow.on('closed', () => {
+    if (emailCheckInterval) {
+      clearInterval(emailCheckInterval);
+      emailCheckInterval = null;
+    }
+    mainWindow = null;
+  });
 
   // Enable context menu (right-click menu)
   mainWindow.webContents.on('context-menu', (event, params) => {
@@ -86,11 +95,15 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    // Clean up email check interval
-    if (emailCheckInterval) {
-      clearInterval(emailCheckInterval);
-    }
     app.quit();
+  }
+});
+
+app.on('before-quit', () => {
+  // Clean up email check interval before app quits
+  if (emailCheckInterval) {
+    clearInterval(emailCheckInterval);
+    emailCheckInterval = null;
   }
 });
 
