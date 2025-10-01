@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import formatName from '../../utils/formatName.mjs';
+
+function formatName(entry) {
+  return `${entry.lastName} ${entry.firstName}`;
+}
 
 function EntryDetailModal({ entry, onClose, onEdit }) {
   const [editingSection, setEditingSection] = useState(null);

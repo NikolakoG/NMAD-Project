@@ -1,5 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import formatName from '../../utils/formatName.mjs';
+
+function formatName(entry) {
+  return `${entry.lastName} ${entry.firstName}`;
+}
 
 function EntryTable({ entries, searchTerm, onEdit, onDelete, onView }) {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });

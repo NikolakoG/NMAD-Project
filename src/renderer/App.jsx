@@ -3,9 +3,12 @@ import EntryTable from './components/EntryTable';
 import EntryModal from './components/EntryModal';
 import EntryDetailModal from './components/EntryDetailModal';
 import EmailConfig from './components/EmailConfig';
-import formatName from '../utils/formatName.mjs';
 
 const { ipcRenderer } = window.require('electron');
+
+function formatName(entry) {
+  return `${entry.lastName} ${entry.firstName}`;
+}
 
 function App() {
   const [entries, setEntries] = useState([]);
