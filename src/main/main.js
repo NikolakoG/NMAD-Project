@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain, Menu, MenuItem } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, MenuItem, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 const { sendEmailNotification, sendAlertEmail } = require('./emailService');
+const PDFExtract = require('pdf.js-extract').PDFExtract;
 
 function formatName(entry) {
   return `${entry.lastName} ${entry.firstName}`;
@@ -10,6 +11,8 @@ function formatName(entry) {
 let mainWindow;
 let dataFilePath;
 let emailTrackingPath;
+let therapistSchedulePath;
+let customNonWorkingDaysPath;
 let emailCheckInterval;
 
 const createWindow = () => {
@@ -79,7 +82,9 @@ app.whenReady().then(() => {
   // Set up data file paths in user data directory
   dataFilePath = path.join(app.getPath('userData'), 'entries.json');
   emailTrackingPath = path.join(app.getPath('userData'), 'email-tracking.json');
-  
+  therapistSchedulePath = path.join(app.getPath('userData'), 'therapist-schedule.json');
+  customNonWorkingDaysPath = path.join(app.getPath('userData'), 'custom-non-working-days.json');
+
   createWindow();
   
   // Initialize email scheduling system after a delay to ensure renderer is ready
@@ -154,6 +159,99 @@ ipcMain.handle('send-alert-email', async (_, config, entries) => {
 ipcMain.handle('get-email-tracking', async () => {
   return await loadEmailTracking();
 });
+
+// IPC handlers for therapist schedule
+ipcMain.handle('load-therapist-schedule', async () => {
+  try {
+    const data = await fs.readFile(therapistSchedulePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    // Return default structure if file doesn't exist
+    return {
+      therapists: ['Γκάβαλη Κωνσταντίνα', 'Τάρλα Αντωνία'],
+      schedule: {
+        'Δευτέρα': [],
+        'Τρίτη': [],
+        'Τετάρτη': [],
+        'Πέμπτη': [],
+        'Παρασκευή': []
+      }
+    };
+  }
+});
+
+ipcMain.handle('save-therapist-schedule', async (event, scheduleData) => {
+  try {
+    await fs.writeFile(therapistSchedulePath, JSON.stringify(scheduleData, null, 2));
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC handlers for custom non-working days
+ipcMain.handle('load-custom-non-working-days', async () => {
+  try {
+    const data = await fs.readFile(customNonWorkingDaysPath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    // Return empty array if file doesn't exist
+    return [];
+  }
+});
+
+ipcMain.handle('save-custom-non-working-days', async (event, days) => {
+  try {
+    await fs.writeFile(customNonWorkingDaysPath, JSON.stringify(days, null, 2));
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('extract-pdf-data', async (event, arrayBuffer) => {
+  try {
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Write buffer to a temporary file
+    const tempFilePath = path.join(app.getPath('temp'), `temp-pdf-${Date.now()}.pdf`);
+    await fs.writeFile(tempFilePath, buffer);
+
+    // Extract PDF data
+    const pdfExtract = new PDFExtract();
+    const data = await pdfExtract.extract(tempFilePath, {});
+
+    // Clean up temp file
+    await fs.unlink(tempFilePath);
+
+    // Extract text from all pages
+    let fullText = '';
+    data.pages.forEach(page => {
+      page.content.forEach(item => {
+        if (item.str) {
+          fullText += item.str + ' ';
+        }
+      });
+      fullText += '\n';
+    });
+
+    // Return the extracted data
+    return {
+      success: true,
+      text: fullText.trim(),
+      numpages: data.pages.length,
+      pages: data.pages,
+      meta: data.meta
+    };
+  } catch (error) {
+    console.error('Error extracting PDF data:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+
 
 // Email scheduling system
 async function initializeEmailScheduler() {

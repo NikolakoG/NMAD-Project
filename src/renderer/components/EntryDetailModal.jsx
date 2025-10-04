@@ -23,17 +23,15 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
       case 'amka':
         setEditData({
           childAmka: entry.childAmka || '',
-          parentAmka: entry.parentAmka || ''
-        });
-        break;
-      case 'contact':
-        setEditData({
+          parentFullName: entry.parentFullName || '',
+          parentAmka: entry.parentAmka || '',
           phone: entry.phone || ''
         });
         break;
       case 'opinion':
         setEditData({
           opinionCode: entry.opinionCode || '',
+          diagnosisCode: entry.diagnosisCode || '',
           opinionValue: entry.opinionValue || ''
         });
         break;
@@ -173,18 +171,12 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
                 <h4>Πληροφορίες Μαθητή</h4>
                 
                 {renderEditableSection(
-                  'Στοιχεία Επικοινωνίας',
-                  [
-                    { key: 'phone', label: 'Τηλέφωνο', placeholder: 'Εισάγετε αριθμό τηλεφώνου' }
-                  ],
-                  'contact'
-                )}
-
-                {renderEditableSection(
-                  'Στοιχεία ΑΜΚΑ',
+                  'Στοιχεία ΑΜΚΑ & Επικοινωνίας',
                   [
                     { key: 'childAmka', label: 'ΑΜΚΑ Μαθητή', placeholder: 'Εισάγετε ΑΜΚΑ Μαθητή' },
-                    { key: 'parentAmka', label: 'ΑΜΚΑ Γονέα', placeholder: 'Εισάγετε ΑΜΚΑ γονέα' }
+                    { key: 'parentFullName', label: 'Ονοματεπώνυμο Γονέα', placeholder: 'Εισάγετε ονοματεπώνυμο γονέα' },
+                    { key: 'parentAmka', label: 'ΑΜΚΑ Γονέα', placeholder: 'Εισάγετε ΑΜΚΑ γονέα' },
+                    { key: 'phone', label: 'Τηλέφωνο', placeholder: 'Εισάγετε αριθμό τηλεφώνου' }
                   ],
                   'amka'
                 )}
@@ -208,9 +200,10 @@ function EntryDetailModal({ entry, onClose, onEdit }) {
                   'Στοιχεία Γνωμάτευσης',
                   [
                     { key: 'opinionCode', label: 'Κωδικός Γνωμάτευσης', placeholder: 'Εισάγετε κωδικό γνωμάτευσης' },
-                    { 
-                      key: 'opinionValue', 
-                      label: 'Αξία Γνωμάτευσης', 
+                    { key: 'diagnosisCode', label: 'Κωδικός Διάγνωσης', placeholder: 'Εισάγετε κωδικό διάγνωσης' },
+                    {
+                      key: 'opinionValue',
+                      label: 'Αξία Γνωμάτευσης',
                       placeholder: 'Εισάγετε αξία γνωμάτευσης',
                       formatter: (value) => value ? `${value} €` : '- €'
                     }

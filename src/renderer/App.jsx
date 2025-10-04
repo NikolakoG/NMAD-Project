@@ -3,6 +3,10 @@ import EntryTable from './components/EntryTable';
 import EntryModal from './components/EntryModal';
 import EntryDetailModal from './components/EntryDetailModal';
 import EmailConfig from './components/EmailConfig';
+import PersonSelector from './components/PersonSelector';
+import FileUploader from './components/FileUploader';
+import TherapistSchedule from './components/TherapistSchedule';
+import NonWorkingDays from './components/NonWorkingDays';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -11,6 +15,7 @@ function formatName(entry) {
 }
 
 function App() {
+  const [activeTab, setActiveTab] = useState('entries');
   const [entries, setEntries] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
@@ -24,10 +29,32 @@ function App() {
   const [emailTracking, setEmailTracking] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // New tab state
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [extractedPdfData, setExtractedPdfData] = useState(null);
+  const [showTherapistSchedule, setShowTherapistSchedule] = useState(false);
+  const [showNonWorkingDays, setShowNonWorkingDays] = useState(false);
+
+  // Therapists state shared between TherapistSchedule and FileUploader
+  const [therapists, setTherapists] = useState([
+    { name: 'Γκάβαλη Κωνσταντίνα', type: 'Λογοθεραπεία' },
+    { name: 'Τάρλα Αντωνία', type: 'Εργοθεραπεία' }
+  ]);
+  const [therapistSchedule, setTherapistSchedule] = useState({
+    'Δευτέρα': [],
+    'Τρίτη': [],
+    'Τετάρτη': [],
+    'Πέμπτη': [],
+    'Παρασκευή': []
+  });
+  const [customNonWorkingDays, setCustomNonWorkingDays] = useState([]);
+
   useEffect(() => {
     loadEntries();
     loadEmailConfig();
     loadEmailTracking();
+    loadTherapistSchedule();
+    loadCustomNonWorkingDays();
     
     // Listen for IPC messages from main process
     ipcRenderer.on('show-catchup-alert', handleCatchupAlert);
@@ -67,6 +94,64 @@ function App() {
       setEmailTracking(tracking);
     } catch (error) {
       console.error('Σφάλμα φόρτωσης παρακολούθησης email:', error);
+    }
+  };
+
+  const loadTherapistSchedule = async () => {
+    try {
+      const data = await ipcRenderer.invoke('load-therapist-schedule');
+      if (data.therapists) {
+        setTherapists(data.therapists);
+      }
+      if (data.schedule) {
+        setTherapistSchedule(data.schedule);
+      }
+    } catch (error) {
+      console.error('Σφάλμα φόρτωσης προγράμματος θεραπευτών:', error);
+    }
+  };
+
+  const saveTherapistSchedule = async (schedule) => {
+    try {
+      const scheduleData = {
+        therapists,
+        schedule
+      };
+      await ipcRenderer.invoke('save-therapist-schedule', scheduleData);
+      setTherapistSchedule(schedule);
+    } catch (error) {
+      console.error('Σφάλμα αποθήκευσης προγράμματος θεραπευτών:', error);
+    }
+  };
+
+  const updateTherapists = async (newTherapists) => {
+    setTherapists(newTherapists);
+    try {
+      const scheduleData = {
+        therapists: newTherapists,
+        schedule: therapistSchedule
+      };
+      await ipcRenderer.invoke('save-therapist-schedule', scheduleData);
+    } catch (error) {
+      console.error('Σφάλμα αποθήκευσης θεραπευτών:', error);
+    }
+  };
+
+  const loadCustomNonWorkingDays = async () => {
+    try {
+      const data = await ipcRenderer.invoke('load-custom-non-working-days');
+      setCustomNonWorkingDays(data || []);
+    } catch (error) {
+      console.error('Σφάλμα φόρτωσης μη εργάσιμων ημερών:', error);
+    }
+  };
+
+  const saveCustomNonWorkingDays = async (days) => {
+    try {
+      await ipcRenderer.invoke('save-custom-non-working-days', days);
+      setCustomNonWorkingDays(days);
+    } catch (error) {
+      console.error('Σφάλμα αποθήκευσης μη εργάσιμων ημερών:', error);
     }
   };
 
@@ -237,13 +322,85 @@ function App() {
     setPendingAlertEntries([]);
   };
 
+  // Handlers for new tab
+  const handleSelectPerson = (person) => {
+    setSelectedPerson(person);
+  };
+
+  const handleBackToPersonList = () => {
+    setSelectedPerson(null);
+    setExtractedPdfData(null);
+  };
+
+  const handleFileSelected = (file, pdfData) => {
+    console.log('PDF data extracted:', pdfData);
+    setExtractedPdfData(pdfData);
+  };
+
+  const handleShowTherapistSchedule = () => {
+    setShowTherapistSchedule(true);
+  };
+
+  const handleBackFromSchedule = () => {
+    setShowTherapistSchedule(false);
+  };
+
+  const handleShowNonWorkingDays = () => {
+    setShowNonWorkingDays(true);
+  };
+
+  const handleBackFromNonWorkingDays = () => {
+    setShowNonWorkingDays(false);
+  };
+
+  const handleUpdatePersonAmka = async (personId, newAmka) => {
+    // Update entries state
+    const updatedEntries = entries.map(entry =>
+      entry.id === personId
+        ? { ...entry, childAmka: newAmka }
+        : entry
+    );
+    setEntries(updatedEntries);
+
+    // Also update selectedPerson if it's the one being modified
+    if (selectedPerson && selectedPerson.id === personId) {
+      setSelectedPerson({ ...selectedPerson, childAmka: newAmka });
+    }
+
+    // Save to database
+    await saveEntries(updatedEntries);
+  };
+
   return (
-    <div className="app">
-      <div className="header">
-        <h1>Διαχείριση Γνωματεύσεων</h1>
+    <div className="app-container">
+      <div className="sidebar">
+        <div className="sidebar-header">
+          <h2>Μενού</h2>
+        </div>
+        <nav className="sidebar-nav">
+          <button
+            className={`nav-item ${activeTab === 'entries' ? 'active' : ''}`}
+            onClick={() => setActiveTab('entries')}
+          >
+            Καταχωρήσεις
+          </button>
+          <button
+            className={`nav-item ${activeTab === 'receipts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('receipts')}
+          >
+            Βεβαιώσεις
+          </button>
+        </nav>
       </div>
 
-      <div className="table-section">
+      <div className="main-content">
+        {activeTab === 'entries' && (
+          <div className="app">
+            <div className="header">
+              <h1>Διαχείριση Καταχωρήσεων</h1>
+            </div>
+
+            <div className="table-section">
         {emailTracking && emailTracking.lastEmailDate && (
           <div className="email-status-info">
             <p>
@@ -328,29 +485,68 @@ function App() {
         </div>
       )}
 
-      {showAlertConfirm && (
-        <div className="modal-overlay" onClick={handleCancelSendAlert}>
-          <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header confirm-modal-header">
-              <h3>Επιβεβαίωση Περιληπτικού Email</h3>
-              <button className="close-button" onClick={handleCancelSendAlert}>
-                ✕
-              </button>
-            </div>
-            <p style={{ marginBottom: '16px', textAlign: 'center' }}>Είστε σίγουρος ότι θέλετε να στείλετε περιληπτικό email με την αναφορά;</p>
-            <p style={{ marginBottom: '20px', textAlign: 'center' }}><strong>{pendingAlertEntries.length} καταχωρήσεις</strong> θα συμπεριληφθούν (ληγμένες ή που λήγουν σε 10 ημέρες).</p>
-            <div className="modal-actions">
-              <button className="btn btn-primary" onClick={handleConfirmSendAlert}>
-                Ναι, Στείλε Email
-              </button>
-              <button className="btn btn-secondary" onClick={handleCancelSendAlert}>
-                Όχι, Ακύρωση
-              </button>
-            </div>
+            {showAlertConfirm && (
+              <div className="modal-overlay" onClick={handleCancelSendAlert}>
+                <div className="modal confirm-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="modal-header confirm-modal-header">
+                    <h3>Επιβεβαίωση Περιληπτικού Email</h3>
+                    <button className="close-button" onClick={handleCancelSendAlert}>
+                      ✕
+                    </button>
+                  </div>
+                  <p style={{ marginBottom: '16px', textAlign: 'center' }}>Είστε σίγουρος ότι θέλετε να στείλετε περιληπτικό email με την αναφορά;</p>
+                  <p style={{ marginBottom: '20px', textAlign: 'center' }}><strong>{pendingAlertEntries.length} καταχωρήσεις</strong> θα συμπεριληφθούν (ληγμένες ή που λήγουν σε 10 ημέρες).</p>
+                  <div className="modal-actions">
+                    <button className="btn btn-primary" onClick={handleConfirmSendAlert}>
+                      Ναι, Στείλε Email
+                    </button>
+                    <button className="btn btn-secondary" onClick={handleCancelSendAlert}>
+                      Όχι, Ακύρωση
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
+        {activeTab === 'receipts' && (
+          <div className="app">
+            {showTherapistSchedule ? (
+              <TherapistSchedule
+                onBack={handleBackFromSchedule}
+                therapists={therapists}
+                onUpdateTherapists={updateTherapists}
+                schedule={therapistSchedule}
+                onUpdateSchedule={saveTherapistSchedule}
+              />
+            ) : showNonWorkingDays ? (
+              <NonWorkingDays
+                onBack={handleBackFromNonWorkingDays}
+                customNonWorkingDays={customNonWorkingDays}
+                onUpdateCustomNonWorkingDays={saveCustomNonWorkingDays}
+              />
+            ) : !selectedPerson ? (
+              <PersonSelector
+                entries={entries}
+                onSelectPerson={handleSelectPerson}
+                onShowTherapistSchedule={handleShowTherapistSchedule}
+                onShowNonWorkingDays={handleShowNonWorkingDays}
+              />
+            ) : (
+              <FileUploader
+                selectedPerson={selectedPerson}
+                onFileSelected={handleFileSelected}
+                onBack={handleBackToPersonList}
+                therapists={therapists}
+                therapistSchedule={therapistSchedule}
+                customNonWorkingDays={customNonWorkingDays}
+                onUpdatePersonAmka={handleUpdatePersonAmka}
+              />
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

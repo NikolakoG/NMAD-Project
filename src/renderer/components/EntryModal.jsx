@@ -7,9 +7,11 @@ function EntryModal({ entry, onSave, onClose }) {
     startingDate: '',
     endingDate: '',
     childAmka: '',
+    parentFullName: '',
     parentAmka: '',
     phone: '',
     opinionCode: '',
+    diagnosisCode: '',
     opinionValue: '',
     taxisUsername: '',
     taxisPassword: '',
@@ -29,9 +31,11 @@ function EntryModal({ entry, onSave, onClose }) {
         startingDate: entry.startingDate || '',
         endingDate: entry.endingDate || '',
         childAmka: entry.childAmka || '',
+        parentFullName: entry.parentFullName || '',
         parentAmka: entry.parentAmka || '',
         phone: entry.phone || '',
         opinionCode: entry.opinionCode || '',
+        diagnosisCode: entry.diagnosisCode || '',
         opinionValue: entry.opinionValue || '',
         taxisUsername: entry.taxisUsername || '',
         taxisPassword: entry.taxisPassword || '',
@@ -49,9 +53,11 @@ function EntryModal({ entry, onSave, onClose }) {
         startingDate: '',
         endingDate: '',
         childAmka: '',
+        parentFullName: '',
         parentAmka: '',
         phone: '',
         opinionCode: '',
+        diagnosisCode: '',
         opinionValue: '',
         taxisUsername: '',
         taxisPassword: '',
@@ -100,6 +106,26 @@ function EntryModal({ entry, onSave, onClose }) {
 
     if (!formData.phone.trim()) {
       alert('Παρακαλώ εισάγετε αριθμό τηλεφώνου');
+      return;
+    }
+
+    if (!formData.childAmka.trim()) {
+      alert('Παρακαλώ εισάγετε ΑΜΚΑ μαθητή');
+      return;
+    }
+
+    if (!formData.parentFullName.trim()) {
+      alert('Παρακαλώ εισάγετε ονοματεπώνυμο γονέα');
+      return;
+    }
+
+    if (!formData.parentAmka.trim()) {
+      alert('Παρακαλώ εισάγετε ΑΜΚΑ γονέα');
+      return;
+    }
+
+    if (!formData.opinionCode.trim()) {
+      alert('Παρακαλώ εισάγετε κωδικό γνωμάτευσης');
       return;
     }
 
@@ -160,6 +186,45 @@ function EntryModal({ entry, onSave, onClose }) {
                 </div>
 
                 <div className="form-group">
+                  <label htmlFor="childAmka">ΑΜΚΑ Μαθητή: *</label>
+                  <input
+                    type="number"
+                    id="childAmka"
+                    name="childAmka"
+                    value={formData.childAmka}
+                    onChange={handleInputChange}
+                    placeholder="Εισάγετε ΑΜΚΑ μαθητή"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="parentFullName">Ονοματεπώνυμο Γονέα: *</label>
+                  <input
+                    type="text"
+                    id="parentFullName"
+                    name="parentFullName"
+                    value={formData.parentFullName}
+                    onChange={handleInputChange}
+                    placeholder="Εισάγετε ονοματεπώνυμο γονέα"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="parentAmka">ΑΜΚΑ Γονέα: *</label>
+                  <input
+                    type="number"
+                    id="parentAmka"
+                    name="parentAmka"
+                    value={formData.parentAmka}
+                    onChange={handleInputChange}
+                    placeholder="Εισάγετε ΑΜΚΑ γονέα"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
                   <label htmlFor="phone">Τηλέφωνο: *</label>
                   <input
                     type="number"
@@ -169,30 +234,6 @@ function EntryModal({ entry, onSave, onClose }) {
                     onChange={handleInputChange}
                     placeholder="Εισάγετε αριθμό τηλεφώνου"
                     required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="childAmka">ΑΜΚΑ Μαθητή:</label>
-                  <input
-                    type="number"
-                    id="childAmka"
-                    name="childAmka"
-                    value={formData.childAmka}
-                    onChange={handleInputChange}
-                    placeholder="Εισάγετε ΑΜΚΑ μαθητή"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="parentAmka">ΑΜΚΑ Γονέα:</label>
-                  <input
-                    type="number"
-                    id="parentAmka"
-                    name="parentAmka"
-                    value={formData.parentAmka}
-                    onChange={handleInputChange}
-                    placeholder="Εισάγετε ΑΜΚΑ γονέα"
                   />
                 </div>
 
@@ -259,6 +300,18 @@ function EntryModal({ entry, onSave, onClose }) {
                     value={formData.opinionCode}
                     onChange={handleInputChange}
                     placeholder="Εισάγετε κωδικό γνωμάτευσης"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="diagnosisCode">Κωδικός Διάγνωσης:</label>
+                  <input
+                    type="text"
+                    id="diagnosisCode"
+                    name="diagnosisCode"
+                    value={formData.diagnosisCode}
+                    onChange={handleInputChange}
+                    placeholder="Εισάγετε κωδικό διάγνωσης"
                   />
                 </div>
 
