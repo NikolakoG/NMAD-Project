@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function PersonSelector({ entries, onSelectPerson, onShowTherapistSchedule, onShowNonWorkingDays }) {
+function PersonSelector({ entries, onSelectPerson }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredEntries = entries.filter(entry => {
@@ -14,20 +14,6 @@ function PersonSelector({ entries, onSelectPerson, onShowTherapistSchedule, onSh
         <div>
           <h2 className="selector-title">Δημιουργία Βεβαιώσεων</h2>
           <p className="selector-subtitle">Διαλέξτε ένα άτομο για να δημιουργήσετε απόδειξη/βεβαίωση.</p>
-        </div>
-        <div className="header-buttons">
-          <button
-            className="btn btn-secondary therapist-schedule-btn"
-            onClick={onShowTherapistSchedule}
-          >
-            Πρόγραμμα Θεραπευτών
-          </button>
-          <button
-            className="btn btn-secondary non-working-days-btn"
-            onClick={onShowNonWorkingDays}
-          >
-            Μέρες μη λειτουργίας
-          </button>
         </div>
       </div>
 

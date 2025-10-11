@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { getPublicHolidays as getHolidaysUtil } from '../utils/holidays';
 
-function NonWorkingDays({ onBack, customNonWorkingDays, onUpdateCustomNonWorkingDays }) {
+function NonWorkingDays({ customNonWorkingDays, onUpdateCustomNonWorkingDays }) {
   const [newDate, setNewDate] = useState('');
   const currentYear = new Date().getFullYear();
 
@@ -47,10 +47,6 @@ function NonWorkingDays({ onBack, customNonWorkingDays, onUpdateCustomNonWorking
 
   return (
     <div className="non-working-days">
-      <button className="back-button" onClick={onBack}>
-        <span className="back-arrow">←</span> Επιστροφή
-      </button>
-
       <h2 className="non-working-title">Μέρες μη λειτουργίας</h2>
 
       <div className="non-working-columns">

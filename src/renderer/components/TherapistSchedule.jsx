@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-function TherapistSchedule({ onBack, therapists, onUpdateTherapists, schedule, onUpdateSchedule }) {
+function TherapistSchedule({ therapists, onUpdateTherapists, schedule, onUpdateSchedule }) {
   const weekdays = ['Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή'];
-  const therapyTypes = ['Λογοθεραπεία', 'Εργοθεραπεία', 'Θεραπεία Συμπεριφοράς'];
+  const therapyTypes = ['Λογοθεραπεία', 'Εργοθεραπεία', 'Θεραπεία Συμπεριφοράς', 'Ειδική Αγωγή - Φυσικοθεραπεία'];
   const [showManageModal, setShowManageModal] = useState(false);
   const [newTherapistName, setNewTherapistName] = useState('');
   const [newTherapistType, setNewTherapistType] = useState('');
@@ -78,10 +78,6 @@ function TherapistSchedule({ onBack, therapists, onUpdateTherapists, schedule, o
 
   return (
     <div className="therapist-schedule">
-      <button className="back-button" onClick={onBack}>
-        <span className="back-arrow">←</span> Επιστροφή
-      </button>
-
       <h2 className="schedule-title">Πρόγραμμα Θεραπευτών</h2>
 
       <div className="schedule-grid">
@@ -103,6 +99,8 @@ function TherapistSchedule({ onBack, therapists, onUpdateTherapists, schedule, o
                   bgColor = '#fff9c4'; // Yellow
                 } else if (therapistType === 'Θεραπεία Συμπεριφοράς') {
                   bgColor = '#bbdefb'; // Blue
+                } else if (therapistType === 'Ειδική Αγωγή - Φυσικοθεραπεία') {
+                  bgColor = '#c8e6c9'; // Light green
                 }
 
                 return (

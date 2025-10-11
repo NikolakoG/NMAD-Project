@@ -32,14 +32,9 @@ function App() {
   // New tab state
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [extractedPdfData, setExtractedPdfData] = useState(null);
-  const [showTherapistSchedule, setShowTherapistSchedule] = useState(false);
-  const [showNonWorkingDays, setShowNonWorkingDays] = useState(false);
 
   // Therapists state shared between TherapistSchedule and FileUploader
-  const [therapists, setTherapists] = useState([
-    { name: 'Γκάβαλη Κωνσταντίνα', type: 'Λογοθεραπεία' },
-    { name: 'Τάρλα Αντωνία', type: 'Εργοθεραπεία' }
-  ]);
+  const [therapists, setTherapists] = useState([]);
   const [therapistSchedule, setTherapistSchedule] = useState({
     'Δευτέρα': [],
     'Τρίτη': [],
@@ -337,21 +332,6 @@ function App() {
     setExtractedPdfData(pdfData);
   };
 
-  const handleShowTherapistSchedule = () => {
-    setShowTherapistSchedule(true);
-  };
-
-  const handleBackFromSchedule = () => {
-    setShowTherapistSchedule(false);
-  };
-
-  const handleShowNonWorkingDays = () => {
-    setShowNonWorkingDays(true);
-  };
-
-  const handleBackFromNonWorkingDays = () => {
-    setShowNonWorkingDays(false);
-  };
 
   const handleUpdatePersonAmka = async (personId, newAmka) => {
     // Update entries state
@@ -393,11 +373,25 @@ function App() {
               // Reset receipts tab to first screen
               setSelectedPerson(null);
               setExtractedPdfData(null);
-              setShowTherapistSchedule(false);
-              setShowNonWorkingDays(false);
             }}
           >
             Βεβαιώσεις
+          </button>
+          <button
+            className={`nav-item ${activeTab === 'therapist-schedule' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('therapist-schedule');
+            }}
+          >
+            Πρόγραμμα Θεραπευτών
+          </button>
+          <button
+            className={`nav-item ${activeTab === 'non-working-days' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('non-working-days');
+            }}
+          >
+            Μέρες μη λειτουργίας
           </button>
         </nav>
       </div>
@@ -521,26 +515,10 @@ function App() {
 
         {activeTab === 'receipts' && (
           <div className="app">
-            {showTherapistSchedule ? (
-              <TherapistSchedule
-                onBack={handleBackFromSchedule}
-                therapists={therapists}
-                onUpdateTherapists={updateTherapists}
-                schedule={therapistSchedule}
-                onUpdateSchedule={saveTherapistSchedule}
-              />
-            ) : showNonWorkingDays ? (
-              <NonWorkingDays
-                onBack={handleBackFromNonWorkingDays}
-                customNonWorkingDays={customNonWorkingDays}
-                onUpdateCustomNonWorkingDays={saveCustomNonWorkingDays}
-              />
-            ) : !selectedPerson ? (
+            {!selectedPerson ? (
               <PersonSelector
                 entries={entries}
                 onSelectPerson={handleSelectPerson}
-                onShowTherapistSchedule={handleShowTherapistSchedule}
-                onShowNonWorkingDays={handleShowNonWorkingDays}
               />
             ) : (
               <FileUploader
@@ -553,6 +531,26 @@ function App() {
                 onUpdatePersonAmka={handleUpdatePersonAmka}
               />
             )}
+          </div>
+        )}
+
+        {activeTab === 'therapist-schedule' && (
+          <div className="app">
+            <TherapistSchedule
+              therapists={therapists}
+              onUpdateTherapists={updateTherapists}
+              schedule={therapistSchedule}
+              onUpdateSchedule={saveTherapistSchedule}
+            />
+          </div>
+        )}
+
+        {activeTab === 'non-working-days' && (
+          <div className="app">
+            <NonWorkingDays
+              customNonWorkingDays={customNonWorkingDays}
+              onUpdateCustomNonWorkingDays={saveCustomNonWorkingDays}
+            />
           </div>
         )}
       </div>

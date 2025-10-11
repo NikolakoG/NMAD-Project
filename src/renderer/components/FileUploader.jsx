@@ -82,14 +82,8 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
     if (normalized.includes('ΣΥΜΠΕΡΙΦΟΡΑΣ') || normalized.includes('ΣΥΜΠΕΡΙΦΟΡΑ')) {
       return 'Θεραπεία Συμπεριφοράς';
     }
-    if (normalized.includes('ΦΥΣΙΚΟΘΕΡΑΠΕΙ') || normalized.includes('ΦΥΣΙΚΟΘΕΡΑΠΙ')) {
-      return 'Φυσικοθεραπεία';
-    }
-    if (normalized.includes('ΨΥΧΟΘΕΡΑΠΕΙ') || normalized.includes('ΨΥΧΟΘΕΡΑΠΙ')) {
-      return 'Ψυχοθεραπεία';
-    }
-    if (normalized.includes('ΕΙΔΙΚΗ') || normalized.includes('ΕΙΔΙΚ')) {
-      return 'Ειδική Αγωγή';
+    if (normalized.includes('ΕΙΔΙΚΗ') && normalized.includes('ΦΥΣΙΚΟΘΕΡΑΠΕΙΑ')) {
+      return 'Ειδική Αγωγή - Φυσικοθεραπεία';
     }
 
     return type;
@@ -213,18 +207,10 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
     // Extract Συνεδρίες (Sessions)
     // Find therapy type followed by "Συνολική Ποσότητα Είδους:" and then a number
     const therapyTypes = [
+      'ΕΙΔΙΚΗ ΑΓΩΓΗ/ΦΥΣΙΚΟΘΕΡΑΠΕΙΑ',
       'ΛΟΓΟΘΕΡΑΠΕΙΑ',
-      'ΛΟΓΟΘΕΡΑΠΕΊΑ',
       'ΕΡΓΟΘΕΡΑΠΕΙΑ',
-      'ΕΡΓΟΘΕΡΑΠΕΊΑ',
-      'ΘΕΡΑΠΕΙΑ ΣΥΜΠΕΡΙΦΟΡΑΣ',
-      'ΘΕΡΑΠΕΊΑ ΣΥΜΠΕΡΙΦΟΡΑΣ',
-      'ΦΥΣΙΚΟΘΕΡΑΠΕΙΑ',
-      'ΦΥΣΙΚΟΘΕΡΑΠΕΊΑ',
-      'ΨΥΧΟΘΕΡΑΠΕΙΑ',
-      'ΨΥΧΟΘΕΡΑΠΕΊΑ',
-      'ΕΙΔΙΚΗ ΑΓΩΓΗ',
-      'ΕΙΔΙΚΉ ΑΓΩΓΉ'
+      'ΘΕΡΑΠΕΙΑ ΣΥΜΠΕΡΙΦΟΡΑΣ'
     ];
 
     therapyTypes.forEach(therapyType => {
@@ -251,7 +237,8 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
     const referralPattern = /(\d+)\s+με\s+διάρκεια\s+ισχύος\s+από\s+([\d\/]+)\s+έως\s+([\d\/]+)/g;
 
     // Pattern for therapy names (including alternate forms)
-    const therapyNamePattern = /(ΑΓΩΓΗ\s+ΛΟΓΟΥ\s*-\s*ΛΟΓΟΘΕΡΑΠΕΙΑ|ΛΟΓΟΘΕΡΑΠΕΙΑ|ΛΟΓΟΘΕΡΑΠΕΊΑ|ΕΡΓΟΘΕΡΑΠΕΙΑ|ΕΡΓΟΘΕΡΑΠΕΊΑ|ΘΕΡΑΠΕΙΑ\s+ΣΥΜΠΕΡΙΦΟΡΑΣ|ΘΕΡΑΠΕΊΑ\s+ΣΥΜΠΕΡΙΦΟΡΑΣ|ΦΥΣΙΚΟΘΕΡΑΠΕΙΑ|ΦΥΣΙΚΟΘΕΡΑΠΕΊΑ|ΨΥΧΟΘΕΡΑΠΕΙΑ|ΨΥΧΟΘΕΡΑΠΕΊΑ|ΕΙΔΙΚΗ\s+ΑΓΩΓΗ|ΕΙΔΙΚΉ\s+ΑΓΩΓΉ)/gi;
+    // Note: Order matters - more specific patterns (like combinations) should come first
+    const therapyNamePattern = /(ΕΙΔΙΚΗ\s+ΑΓΩΓΗ\/ΦΥΣΙΚΟΘΕΡΑΠΕΙΑ[^/]*|ΑΓΩΓΗ\s+ΛΟΓΟΥ\s*-\s*ΛΟΓΟΘΕΡΑΠΕΙΑ|ΛΟΓΟΘΕΡΑΠΕΙΑ|ΕΡΓΟΘΕΡΑΠΕΙΑ|ΘΕΡΑΠΕΙΑ\s+ΣΥΜΠΕΡΙΦΟΡΑΣ)/gi;
 
     // Find all positions of referrals and therapy names
     const items = [];
@@ -274,6 +261,10 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
       // Normalize ΑΓΩΓΗ ΛΟΓΟΥ - ΛΟΓΟΘΕΡΑΠΕΙΑ to ΛΟΓΟΘΕΡΑΠΕΙΑ
       if (therapyName.includes('ΑΓΩΓΗ ΛΟΓΟΥ')) {
         therapyName = 'ΛΟΓΟΘΕΡΑΠΕΙΑ';
+      }
+      // Keep the combined therapy type as is (don't split it)
+      if (therapyName.includes('ΕΙΔΙΚΗ ΑΓΩΓΗ/ΦΥΣΙΚΟΘΕΡΑΠΕΙΑ')) {
+        // Already in correct format, just store it
       }
       items.push({
         type: 'therapy',
