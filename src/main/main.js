@@ -252,6 +252,56 @@ ipcMain.handle('extract-pdf-data', async (event, arrayBuffer) => {
   }
 });
 
+// IPC handler to get template path
+ipcMain.handle('get-template-path', async () => {
+  // Check if we're in development by checking if __dirname is src/main
+  const isDev = __dirname.includes('src/main');
+
+  let templatePath;
+  if (isDev) {
+    // For development, use absolute path to the project
+    templatePath = '/Users/gnikolakopoulos/Projects/NMAD-Project/PlaceholderForm.docx';
+  } else {
+    // In production, use the resources path
+    templatePath = path.join(process.resourcesPath, 'PlaceholderForm.docx');
+  }
+  return templatePath;
+});
+
+// IPC handler to read template file
+ipcMain.handle('read-file', async (event, filePath) => {
+  try {
+    const content = await fs.readFile(filePath);
+    return content;
+  } catch (error) {
+    console.error('Error reading file:', error);
+    throw error;
+  }
+});
+
+// IPC handler to save DOCX file
+ipcMain.handle('save-docx', async (event, buffer, defaultFileName) => {
+  try {
+    const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+      title: 'Αποθήκευση Βεβαίωσης',
+      defaultPath: defaultFileName,
+      filters: [
+        { name: 'Word Documents', extensions: ['docx'] }
+      ]
+    });
+
+    if (canceled || !filePath) {
+      return false;
+    }
+
+    await fs.writeFile(filePath, buffer);
+    return true;
+  } catch (error) {
+    console.error('Error saving DOCX:', error);
+    throw error;
+  }
+});
+
 
 // Email scheduling system
 async function initializeEmailScheduler() {

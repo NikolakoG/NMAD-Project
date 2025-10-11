@@ -28,8 +28,8 @@ To receive email notifications, you'll need to configure Gmail with an App Passw
 - **Save this password** - this is what you'll use in the app
 - **Important**: This App password is used only for the FollowUpProject
 
-#### Step 4: Configure in FollowUp Project
-1. Open FollowUp Project
+#### Step 4: Configure in Διαχειριστικό
+1. Open Διαχειριστικό
 2. In the Email Configuration section:
    - **Service**: Select "Gmail"
    - **Sender Email**: Your full Gmail address (e.g., `yourname@gmail.com`)

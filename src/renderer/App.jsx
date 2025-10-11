@@ -380,13 +380,22 @@ function App() {
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${activeTab === 'entries' ? 'active' : ''}`}
-            onClick={() => setActiveTab('entries')}
+            onClick={() => {
+              setActiveTab('entries');
+            }}
           >
             Καταχωρήσεις
           </button>
           <button
             className={`nav-item ${activeTab === 'receipts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('receipts')}
+            onClick={() => {
+              setActiveTab('receipts');
+              // Reset receipts tab to first screen
+              setSelectedPerson(null);
+              setExtractedPdfData(null);
+              setShowTherapistSchedule(false);
+              setShowNonWorkingDays(false);
+            }}
           >
             Βεβαιώσεις
           </button>

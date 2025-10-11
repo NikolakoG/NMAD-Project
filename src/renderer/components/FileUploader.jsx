@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { isGreekPublicHoliday } from '../utils/holidays';
+import PizZip from 'pizzip';
+import Docxtemplater from 'docxtemplater';
 
 function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTherapy, therapists, therapistSchedule, customNonWorkingDays, onUpdatePersonAmka }) {
   const [file, setFile] = useState(null);
@@ -410,6 +412,121 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
     );
   }
 
+  const generateDocx = async () => {
+    try {
+      const { ipcRenderer } = window.require('electron');
+
+      // Read the template file
+      const templatePath = await ipcRenderer.invoke('get-template-path');
+      console.log('Using template at:', templatePath);
+
+      const content = await ipcRenderer.invoke('read-file', templatePath);
+      console.log('Template file size:', content.length);
+
+      // Load the docx file as binary content
+      const zip = new PizZip(content);
+
+      // Verify the placeholders in the loaded template
+      const xml = zip.files['word/document.xml'].asText();
+      const placeholders = xml.match(/\{\{[^}]*\}\}/g);
+      console.log('Found placeholders:', placeholders);
+
+      const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+      });
+
+      // Helper to format date as DD/MM/YYYY
+      const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      // Prepare session list for the template
+      const sessionsList = finalInfoData.therapists.flatMap(therapistInfo => {
+        if (!therapistInfo.sessionDates || therapistInfo.sessionDates.length === 0) {
+          return [];
+        }
+
+        return therapistInfo.sessionDates.flatMap(dateObj =>
+          Array.from({ length: dateObj.count }, () => ({
+            therapy: therapistInfo.therapy,
+            therapist: therapistInfo.therapist,
+            date: formatDate(dateObj.date)
+          }))
+        );
+      });
+
+      // Format the session list grouped by therapy type
+      const groupedSessions = {};
+      sessionsList.forEach(session => {
+        const key = `${session.therapy} - ${session.therapist}`;
+        if (!groupedSessions[key]) {
+          groupedSessions[key] = {
+            therapy: session.therapy,
+            therapist: session.therapist,
+            dates: []
+          };
+        }
+        groupedSessions[key].dates.push(session.date);
+      });
+
+      // Format as: "X Θεραπείες ΘΕΡΑΠΕΙΑ\nΗμερομηνίες θεραπείας: date1, date2, date3..."
+      const sessionListString = Object.values(groupedSessions).map(group => {
+        const count = group.dates.length;
+        const therapy = group.therapy;
+        const datesStr = group.dates.join(', ');
+        return `${count} Θεραπείες ${therapy}\nΗμερομηνίες θεραπείας: ${datesStr}`;
+      }).join('\n\n');
+
+      // Prepare data for the template
+      const templateData = {
+        RECEIPT_NUMBER: editableInfo.receiptNumber || '',
+        PARENT_NAME: editableInfo.parentName || '',
+        PARENT_AMKA: editableInfo.parentAmka || '',
+        OPINION_NUMBER: editableInfo.opinionNumber || '',
+        STUDENT_NAME: editableInfo.studentName || '',
+        STUDENT_AMKA: editableInfo.studentAmka || '',
+        DATE_FROM: finalInfoData.periodStart || '',
+        DATE_TO: finalInfoData.periodEnd || '',
+        SESSION_LIST: sessionListString
+      };
+
+      console.log('Template data:', templateData);
+
+      // Render the document
+      doc.render(templateData);
+
+      // Generate the document as a buffer
+      const buf = doc.getZip().generate({
+        type: 'nodebuffer',
+        compression: 'DEFLATE',
+      });
+
+      // Save the file
+      const success = await ipcRenderer.invoke('save-docx', buf, `Βεβαιωση_${editableInfo.studentName || 'template'}.docx`);
+
+      if (success) {
+        alert('Το αρχείο δημιουργήθηκε επιτυχώς!');
+      } else {
+        alert('Η αποθήκευση ακυρώθηκε.');
+      }
+    } catch (error) {
+      console.error('Full error object:', error);
+
+      // Docxtemplater specific error handling
+      if (error.properties && error.properties.errors) {
+        const errorMessages = error.properties.errors.map(err => {
+          return `${err.message} at ${err.part}`;
+        }).join('\n');
+        alert('Σφάλμα στο template:\n' + errorMessages);
+      } else {
+        alert('Σφάλμα κατά τη δημιουργία του αρχείου: ' + error.message);
+      }
+    }
+  };
 
   if (showFinalInfo && finalInfoData) {
     // Helper to format date as DD/MM/YYYY
@@ -472,7 +589,12 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
 
         {/* Editable Info Section */}
         <div className="certificate-info-section">
-          <h3>Πληροφορίες Βεβαίωσης</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+            <h3 style={{ margin: 0 }}>Πληροφορίες Βεβαίωσης</h3>
+            <button className="btn btn-primary" onClick={generateDocx}>
+              Δημιουργία Βεβαίωσης
+            </button>
+          </div>
           <div className="info-grid">
             <div className="info-field">
               <label>Αριθμός Απόδειξης:</label>
@@ -967,6 +1089,20 @@ function FileUploader({ selectedPerson, onFileSelected, onBack, onContinueToTher
                     Επιλογή ΑΜΚΑ Μαθητή
                   </button>
                 </div>
+              </div>
+
+              <div style={{ marginTop: '20px', textAlign: 'center', borderTop: '1px solid #ccc', paddingTop: '15px' }}>
+                <p style={{ marginBottom: '10px', fontSize: '14px' }}>ή</p>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowAmkaConflictModal(false);
+                    setConflictAmkaData(null);
+                    onBack();
+                  }}
+                >
+                  Επιστροφή για επιλογή άλλου μαθητή
+                </button>
               </div>
             </div>
           </div>
